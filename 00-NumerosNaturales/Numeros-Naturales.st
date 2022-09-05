@@ -19,14 +19,14 @@ I class
 + anAdder 
 	^anAdder next! !
 
-!I class methodsFor: 'operations' stamp: 'mbp 9/4/2022 15:23:00'!
+!I class methodsFor: 'operations' stamp: 'mbp 9/4/2022 19:04:24'!
 - anNumber
-	self error: 'Negative numbers are not supported'. ! !
+	self error: (self negativeNumbersNotSupportedErrorDescription). ! !
 
-!I class methodsFor: 'operations' stamp: 'mbp 9/4/2022 15:23:07'!
+!I class methodsFor: 'operations' stamp: 'mbp 9/5/2022 15:31:34'!
 / aDivisor 
 	aDivisor = I ifTrue: [^I].
-	self error: 'Can not divide by bigger number'.! !
+	self error: II canNotDivideByBiggerNumberErrorDescription ! !
 
 !I class methodsFor: 'operations' stamp: 'fat 8/28/2022 23:52:45'!
 < aFactor 
@@ -72,9 +72,9 @@ II class
 - aSubtrahend
 	^aSubtrahend substraeteDe: self.! !
 
-!II class methodsFor: 'operations' stamp: 'mbp 9/4/2022 15:23:16'!
+!II class methodsFor: 'operations' stamp: 'mbp 9/4/2022 19:04:46'!
 / aDivisor
-	self < aDivisor ifTrue:[self error: 'Can not divide by bigger number'.]. "No se puede dividir por más grandes"
+	self < aDivisor ifTrue:[self error: (self canNotDivideByBiggerNumberErrorDescription).]. "No se puede dividir por más grandes"
 	self = aDivisor ifTrue:[^I]. "Caso no restar iguales porque 0 no está definido"
 	self - aDivisor < aDivisor ifTrue: [^I]. "Caso base en el que no tengo que dividir más" 
 	^self - aDivisor/ aDivisor + I. "Paso recursivo"! !
@@ -133,7 +133,7 @@ substraeteDe: aMinuend
 	^aMinuend previous - self previous.! !
 
 
-!II class methodsFor: '--** private fileout/in **--' stamp: 'mbp 9/4/2022 15:26:52'!
+!II class methodsFor: '--** private fileout/in **--' stamp: 'mbp 9/5/2022 15:32:37'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -154,7 +154,7 @@ II subclass: #III
 III class
 	instanceVariableNames: ''!
 
-!III class methodsFor: '--** private fileout/in **--' stamp: 'mbp 9/4/2022 15:26:52'!
+!III class methodsFor: '--** private fileout/in **--' stamp: 'mbp 9/5/2022 15:32:37'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -175,7 +175,7 @@ II subclass: #IV
 IV class
 	instanceVariableNames: ''!
 
-!IV class methodsFor: '--** private fileout/in **--' stamp: 'mbp 9/4/2022 15:26:52'!
+!IV class methodsFor: '--** private fileout/in **--' stamp: 'mbp 9/5/2022 15:32:37'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
