@@ -454,25 +454,26 @@ checkPrefixNotContainsAnEmptySpace: prefix
 	((prefix indexOf: $  ifAbsent: [-1]) =-1) ifFalse: [self error: SentenceFinderByPrefix prefixIncludesAnSpaceError].! !
 
 
-!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/18/2022 21:11:18'!
-createACollectionBasedOn: aStack
-	|collectionToFill|
-	collectionToFill := OrderedCollection new.
-	self popElementsFromAStack: aStack toFill: collectionToFill.
-	self pushElementsBackToStack: aStack from: collectionToFill.
-	^collectionToFill 
+!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/19/2022 11:51:05'!
+fill: collectionToReturn with: anElement ifItsPrefixIs: prefix 
+	(anElement beginsWith: prefix) ifTrue: [
+		collectionToReturn addFirst: anElement.
+	]
 	! !
 
-!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/19/2022 09:55:56'!
+!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/19/2022 11:49:15'!
+fill: aCollection withElement: anElement
+	aCollection addFirst: anElement.
+	! !
+
+!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/19/2022 11:52:46'!
 fill: collectionToReturn withElementsWithPrefix: prefix from: aStack andSaveAllElementsIn: backupCollection
 	|anElement|
 	[aStack isEmpty] whileFalse: [
 		anElement := aStack pop.
-		backupCollection addFirst: anElement.
-		(anElement beginsWith: prefix) ifTrue: [
-				collectionToReturn addFirst: anElement.
-			]
-		].
+		self fill: backupCollection withElement: anElement.
+		self fill: collectionToReturn with: anElement ifItsPrefixIs: prefix. 
+	].
 	! !
 
 !SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'fat 9/19/2022 11:08:50'!
@@ -484,14 +485,6 @@ getACollectionOfElementsWithPrefix: prefix from: aStack
 	self pushElementsBackToStack: aStack from: backupCollection .
 	^ collectionToReturn 
 	! !
-
-!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/18/2022 21:10:41'!
-keepElementsWithPrefix: prefix in: aCollection
-	^aCollection select: [:element | element beginsWith: prefix].! !
-
-!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/18/2022 23:50:53'!
-popElementsFromAStack: aStack toFill: aCollection
-	[aStack size > 0] whileTrue: [aCollection addFirst: aStack pop].! !
 
 !SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/18/2022 23:51:57'!
 pushElementsBackToStack: aStack from: aCollection
@@ -518,3 +511,23 @@ emptyPrefixError
 !SentenceFinderByPrefix class methodsFor: 'error messages' stamp: 'mbp 9/18/2022 18:58:33'!
 prefixIncludesAnSpaceError
 	^'El prefijo ingresado contiene espacios en blanco'! !
+
+
+!classDefinition: #XXX category: 'Stack-Exercise'!
+Object subclass: #XXX
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!XXX methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 15:59:03'!
+isEmptySegunElementos: anElement
+	self subclassResponsibility ! !
+
+!XXX methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 16:17:51'!
+popSegunPila: aStack
+	self subclassResponsibility ! !
+
+!XXX methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 16:44:40'!
+topSegunPila: aStack
+	self subclassResponsibility ! !
