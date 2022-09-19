@@ -144,31 +144,44 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 17:40:36'!
+!SentenceFinderByPrefixTest methodsFor: 'assert messages' stamp: 'mbp 9/18/2022 23:36:57'!
+assertThatACollection: aCollection equalsTo: collectionExpected
+	self assert: aCollection = collectionExpected		! !
+
+!SentenceFinderByPrefixTest methodsFor: 'assert messages' stamp: 'mbp 9/18/2022 23:44:42'!
+assertThatTheStack: aStack keepsSize: sizeNumber andTopElement: topElement 
+	self assert: (aStack size = sizeNumber and:[aStack top = topElement]).! !
+
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'mbp 9/19/2022 00:21:06'!
 test01EmptyStackFindsNoCoincidences
 	|aStack|
 	aStack := OOStack new.
-	self assert: ((SentenceFinderByPrefix new find: 'hola' from:aStack) size = 0).! !
+	self assert: (SentenceFinderByPrefix new findSequencesWithPrefix: 'hola' fromAStack:aStack) isEmpty.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 17:59:07'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'mbp 9/19/2022 00:21:06'!
 test02StackWithOneElementFindsACoincidence
 	|aStack collection element|
-	aStack := OOStack new.
 	element := 'hola'.
+	aStack := OOStack new.
 	aStack push: element.
-	collection := SentenceFinderByPrefix new find: element from:aStack.
-	self assert: (collection size = 1 and: [(collection includes: element) and: [aStack size = 1 and:[aStack top = 'hola']]]).! !
+	collection := SentenceFinderByPrefix new findSequencesWithPrefix: element fromAStack:aStack.
+	
+	self assert: collection = (OrderedCollection with: element).
+	self assertThatTheStack: aStack keepsSize: 1 andTopElement: element.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 17:59:17'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'mbp 9/19/2022 00:21:06'!
 test03StackWithOneElementFindsNoCoincidence
 	|aStack collection element|
-	aStack := OOStack new.
 	element := 'hola'.
+	aStack := OOStack new.
 	aStack push: element.
-	collection := SentenceFinderByPrefix new find: 'chau' from:aStack.
-	self assert: ((collection size = 0) and: [aStack size = 1 and:[aStack top = 'hola']]).! !
+	collection := SentenceFinderByPrefix new findSequencesWithPrefix: 'chau' fromAStack:aStack.
+	
+	self assert: collection isEmpty.
+	self assertThatTheStack: aStack keepsSize: 1 andTopElement: element.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 17:51:33'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'mbp 9/19/2022 00:21:07'!
 test04StackWithMultipleElementsFindsSomeCoincidences
 	|aStack collection|
 	aStack := OOStack new.
@@ -178,21 +191,12 @@ test04StackWithMultipleElementsFindsSomeCoincidences
 	aStack push: 'chau'.
 	aStack push: 'buenas noches'.
 	aStack push: 'holaa'.
-	collection := SentenceFinderByPrefix new find: 'hola' from:aStack.
-	self assert: (collection size = 4 and: [
-		(collection includes: 'hola como te va') and:[
-			(collection includes: 'hola') and:[
-				(collection includes: 'hola buen dia') and:[
-					(collection includes: 'holaa') and:[
-						aStack size = 6 and:[
-							aStack top = 'holaa']
-						]
-					]
-				]
-			]
-		]).! !
+	collection := SentenceFinderByPrefix new findSequencesWithPrefix: 'hola' fromAStack:aStack.
+	
+	self assert: collection = (OrderedCollection with: 'hola como te va' with: 'hola' with: 'hola buen dia' with: 'holaa').
+	self assertThatTheStack: aStack keepsSize: 6 andTopElement: 'holaa'.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 17:52:53'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'mbp 9/19/2022 00:21:07'!
 test05StackWithMultipleElementsFindsNoCoincidence
 	|aStack collection|
 	aStack := OOStack new.
@@ -202,19 +206,23 @@ test05StackWithMultipleElementsFindsNoCoincidence
 	aStack push: 'chau'.
 	aStack push: 'buenas noches'.
 	aStack push: 'holaa'.
-	collection := SentenceFinderByPrefix new find: 'adios' from:aStack.
-	self assert: (collection size = 0 and: [aStack size = 6 and:[aStack top = 'holaa']]).! !
+	collection := SentenceFinderByPrefix new findSequencesWithPrefix: 'adios' fromAStack:aStack.
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 17:54:22'!
+	self assert: collection isEmpty.
+	self assertThatTheStack: aStack keepsSize: 6 andTopElement: 'holaa'.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'mbp 9/19/2022 00:21:06'!
 test06StackWithMultipleElementsFindsNoCoincidenceWithPrefixInTheMiddle
 	|aStack collection|
 	aStack := OOStack new.
 	aStack push: 'hola como te va'.
 	aStack push: 'hola como estas'.
-	collection := SentenceFinderByPrefix new find: 'como' from:aStack.
-	self assert: (collection size = 0 and: [aStack size = 2 and:[aStack top = 'hola como estas']]).! !
+	collection := SentenceFinderByPrefix new findSequencesWithPrefix: 'como' fromAStack:aStack.
+	
+	self assert: collection isEmpty.
+	self assertThatTheStack: aStack keepsSize: 2 andTopElement: 'hola como estas'.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 17:56:33'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'mbp 9/19/2022 00:21:06'!
 test07StackWithMultipleElementsIsCaseSensitive
 	|aStack collection|
 	aStack := OOStack new.
@@ -224,32 +232,27 @@ test07StackWithMultipleElementsIsCaseSensitive
 	aStack push: 'chau'.
 	aStack push: 'buenas noches'.
 	aStack push: 'Holaa'.
-	collection := SentenceFinderByPrefix new find: 'Hola' from:aStack.
-	self assert: (collection size = 2 and: [
-		(collection includes: 'Hola buen dia') and:[
-			(collection includes: 'Holaa') and:[
-				aStack size = 6 and:[
-					aStack top = 'Holaa']
-				]
-			]
-		]).! !
+	collection := SentenceFinderByPrefix new findSequencesWithPrefix: 'Hola' fromAStack:aStack.
+	
+	self assert: collection = (OrderedCollection with:'Hola buen dia' with: 'Holaa').
+	self assertThatTheStack: aStack keepsSize: 6 andTopElement: 'Holaa'.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 18:56:31'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'mbp 9/19/2022 00:21:07'!
 test08TryToFindAnEmptyPrefix
 	|aStack |
 	aStack := OOStack new.
 	self
-		should: [SentenceFinderByPrefix new find: '' from:aStack ]
+		should: [SentenceFinderByPrefix new findSequencesWithPrefix: '' fromAStack:aStack ]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix emptyPrefixError]! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'mbp 9/18/2022 18:59:17'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'mbp 9/19/2022 00:21:06'!
 test09TryToFindAPrefixWithAnSpace
 	|aStack |
 	aStack := OOStack new.
 	self
-		should: [SentenceFinderByPrefix new find: 'hola chau' from:aStack ]
+		should: [SentenceFinderByPrefix new findSequencesWithPrefix: 'hola chau' fromAStack:aStack ]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix prefixIncludesAnSpaceError]! !
@@ -298,20 +301,20 @@ increaseSize
 isNotEmpty
 	^false! !
 
-!OOStack methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 15:40:03'!
-isTrueEmpty
+!OOStack methodsFor: 'double dispatch messages' stamp: 'mbp 9/19/2022 00:02:12'!
+isTrulyEmpty
 	^true! !
 
 !OOStack methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 16:17:25'!
 popFromEmptyStack
 	self error: OOStack stackEmptyErrorDescription! !
 
-!OOStack methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 20:15:16'!
-popFromStackWithElements: anterior
+!OOStack methodsFor: 'double dispatch messages' stamp: 'fat 9/19/2022 10:40:49'!
+popFromStackWithElements: theTopElement
 	|elementToReturn|
 	elementToReturn := self top.
 	self decreaseSize.
-	self replaceTopElement: anterior.
+	self replaceTopElement: theTopElement previous.
 	^elementToReturn! !
 
 !OOStack methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 20:15:16'!
@@ -325,10 +328,6 @@ topFromEmptyStack
 !OOStack methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 20:21:34'!
 topFromStackWithElements
 	^topElement value! !
-
-!OOStack methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 16:28:22'!
-topFromStackWithElements: anElement
-	^anElement value! !
 
 
 !OOStack methodsFor: 'initialization' stamp: 'mbp 9/18/2022 20:14:48'!
@@ -375,30 +374,33 @@ topSegunPila: aStack
 
 !classDefinition: #Element category: 'Stack-Exercise'!
 OOStackComponents subclass: #Element
-	instanceVariableNames: 'anterior value'
+	instanceVariableNames: 'previous value'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!Element methodsFor: 'initialization' stamp: 'mbp 9/18/2022 15:54:09'!
+!Element methodsFor: 'initialization' stamp: 'fat 9/19/2022 10:37:43'!
 initializeWithValue: anElement andAnterior: tope
 	value := anElement.
-	anterior := tope! !
+	previous := tope! !
 
 
 !Element methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 15:59:03'!
 isEmptySegunElementos: aStack
 	^aStack isNotEmpty! !
 
-!Element methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 16:25:55'!
+!Element methodsFor: 'double dispatch messages' stamp: 'fat 9/19/2022 10:39:47'!
 popSegunPila: aStack
-	^aStack popFromStackWithElements: anterior! !
+	^aStack popFromStackWithElements: self! !
 
-!Element methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 20:21:53'!
+!Element methodsFor: 'double dispatch messages' stamp: 'mbp 9/19/2022 00:01:07'!
 topSegunPila: aStack
-	"^aStack topFromStackWithElements: self"
 	^aStack topFromStackWithElements! !
 
+
+!Element methodsFor: 'accessing' stamp: 'fat 9/19/2022 10:39:10'!
+previous
+	^previous! !
 
 !Element methodsFor: 'accessing' stamp: 'mbp 9/18/2022 16:24:29'!
 value
@@ -422,9 +424,9 @@ OOStackComponents subclass: #NoElement
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!NoElement methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 15:59:03'!
+!NoElement methodsFor: 'double dispatch messages' stamp: 'mbp 9/19/2022 00:02:13'!
 isEmptySegunElementos: aStack
-	^aStack isTrueEmpty! !
+	^aStack isTrulyEmpty! !
 
 !NoElement methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 16:17:02'!
 popSegunPila: aStack
@@ -441,25 +443,6 @@ Object subclass: #SentenceFinderByPrefix
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
-
-!SentenceFinderByPrefix methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 18:13:59'!
-noSeguirConWhile: collectionToFill with: aStack
-	collectionToFill  reverseDo: [:element | aStack push: element].
-	^collectionToFill ! !
-
-!SentenceFinderByPrefix methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 18:21:28'!
-seguirConWhile:collectionToFill with: aStack
-	collectionToFill add: aStack pop.
-	
-! !
-
-!SentenceFinderByPrefix methodsFor: 'double dispatch messages' stamp: 'mbp 9/18/2022 17:30:46'!
-whileTrue: conditionClosure do: closureToDo
-	conditionClosure value ifTrue: [
-		closureToDo value.
-		thisContext restart.
-		]! !
-
 
 !SentenceFinderByPrefix methodsFor: 'check prefix format' stamp: 'mbp 9/18/2022 20:25:06'!
 checkPrefixIsNotEmpty: prefix
@@ -480,11 +463,25 @@ createACollectionBasedOn: aStack
 	^collectionToFill 
 	! !
 
-!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/18/2022 21:07:42'!
+!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/19/2022 09:55:56'!
+fill: collectionToReturn withElementsWithPrefix: prefix from: aStack andSaveAllElementsIn: backupCollection
+	|anElement|
+	[aStack isEmpty] whileFalse: [
+		anElement := aStack pop.
+		backupCollection addFirst: anElement.
+		(anElement beginsWith: prefix) ifTrue: [
+				collectionToReturn addFirst: anElement.
+			]
+		].
+	! !
+
+!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'fat 9/19/2022 11:08:50'!
 getACollectionOfElementsWithPrefix: prefix from: aStack
-	|collectionToReturn|
-	collectionToReturn := self createACollectionBasedOn: aStack.
-	collectionToReturn := self keepElementsWithPrefix: prefix in: collectionToReturn.
+	|backupCollection collectionToReturn |
+	collectionToReturn := OrderedCollection new.
+	backupCollection := OrderedCollection new.
+	self fill: collectionToReturn withElementsWithPrefix: prefix from: aStack andSaveAllElementsIn: backupCollection.
+	self pushElementsBackToStack: aStack from: backupCollection .
 	^ collectionToReturn 
 	! !
 
@@ -492,17 +489,17 @@ getACollectionOfElementsWithPrefix: prefix from: aStack
 keepElementsWithPrefix: prefix in: aCollection
 	^aCollection select: [:element | element beginsWith: prefix].! !
 
-!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/18/2022 21:28:34'!
+!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/18/2022 23:50:53'!
 popElementsFromAStack: aStack toFill: aCollection
-	[aStack size > 0] whileTrue: [aCollection add: aStack pop].! !
+	[aStack size > 0] whileTrue: [aCollection addFirst: aStack pop].! !
 
-!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/18/2022 20:54:59'!
+!SentenceFinderByPrefix methodsFor: 'finder - private' stamp: 'mbp 9/18/2022 23:51:57'!
 pushElementsBackToStack: aStack from: aCollection
-	aCollection reverseDo: [:element | aStack push: element].! !
+	aCollection do: [:element | aStack push: element].! !
 
 
-!SentenceFinderByPrefix methodsFor: 'finder' stamp: 'mbp 9/18/2022 20:33:56'!
-find: prefix from: aStack
+!SentenceFinderByPrefix methodsFor: 'finder' stamp: 'fat 9/19/2022 11:08:51'!
+findSequencesWithPrefix: prefix fromAStack: aStack
 	self checkPrefixIsNotEmpty: prefix.
 	self checkPrefixNotContainsAnEmptySpace: prefix.
 	^self getACollectionOfElementsWithPrefix: prefix from: aStack 
